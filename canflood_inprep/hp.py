@@ -14,7 +14,7 @@ todo: migrate off of here
 # logger----------
 #==============================================================================
 import logging, os
-mod_logger = logging.getLogger('hp') #creates a child logger of the root
+mod_logger = logging.getLogger() #creates a child logger of the root
 
 #==============================================================================
 # dependency check
@@ -265,8 +265,22 @@ class Qproj(object): #baseclass for working w/ pyqgis outside the native console
 class logger(object): #workaround for qgis logging pythonic
     log_tabnm = 'CanFlood' # qgis logging panel tab name
     
-    log_nm = '' #logger name
+    logger to be created. 
     
+    
+    from pathlib import Path
+    home = str(Path.home()) # get the users home directory. 
+    LOG_FILE_PATH = os.path.join(home, "CanFlood", "CanFlood.log")
+    if not os.path.exists(os.path.dirname(LOG_FILE_PATH)):
+        os.mkdir(os.path.dirname(LOG_FILE_PATH))
+        
+    logger = logging.getLogger()
+    fh = logging.FileHandler(LOG_FILE_PATH)
+    fh.setLevel(logging.NOTSET)
+    logger.addHandler(fh)
+    
+    log_nm = '' #logger name
+        
     def __init__(self, parent):
         #attach
         self.parent = parent
@@ -285,20 +299,24 @@ class logger(object): #workaround for qgis logging pythonic
         
     def info(self, msg):
         self._loghlp(msg, Qgis.Info, push=False)
-
+        logger.info(self, msg)
 
     def debug(self, msg_raw):
         msg = '%s: %s'%(self.log_nm, msg_raw)
+        logger.debug(self, msg)
         QgsLogger.debug(msg)
         
     def warning(self, msg):
+        logger.warning(self, msg)
         self._loghlp(msg, Qgis.Warning, push=False)
 
         
     def push(self, msg):
+        logger.push(self, msg)
         self._loghlp(msg, Qgis.Info, push=True)
 
     def error(self, msg):
+        logger.error(self, msg)
         self._loghlp(msg, Qgis.Critical, push=True)
         
     def _loghlp(self, #helper function for generalized logging
