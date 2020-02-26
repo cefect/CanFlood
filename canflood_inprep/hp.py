@@ -5,6 +5,7 @@ Created on Feb. 7, 2020
 
 common helper functions for use across project
 '''
+from logging import critical
 
 """
 todo: migrate off of here
@@ -265,20 +266,10 @@ class Qproj(object): #baseclass for working w/ pyqgis outside the native console
 class logger(object): #workaround for qgis logging pythonic
     log_tabnm = 'CanFlood' # qgis logging panel tab name
     
-    logger to be created. 
     
     
-    from pathlib import Path
-    home = str(Path.home()) # get the users home directory. 
-    LOG_FILE_PATH = os.path.join(home, "CanFlood", "CanFlood.log")
-    if not os.path.exists(os.path.dirname(LOG_FILE_PATH)):
-        os.mkdir(os.path.dirname(LOG_FILE_PATH))
-        
-    logger = logging.getLogger()
-    fh = logging.FileHandler(LOG_FILE_PATH)
-    fh.setLevel(logging.NOTSET)
-    logger.addHandler(fh)
     
+   
     log_nm = '' #logger name
         
     def __init__(self, parent):
@@ -286,6 +277,19 @@ class logger(object): #workaround for qgis logging pythonic
         self.parent = parent
         
         self.iface = parent.iface
+        
+        from pathlib import Path
+        home = str(Path.home()) # get the users home directory. 
+        LOG_FILE_PATH = os.path.join(home, "CanFlood", "CanFlood.log")
+        os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)
+        self.log = logging.getLogger()
+        fh = logging.FileHandler(LOG_FILE_PATH)
+        fh.setLevel(logging.NOTSET)
+        self.log.addHandler(fh)
+    
+        
+        
+        
         
     def getChild(self, new_childnm):
         
@@ -299,24 +303,24 @@ class logger(object): #workaround for qgis logging pythonic
         
     def info(self, msg):
         self._loghlp(msg, Qgis.Info, push=False)
-        logger.info(self, msg)
+        self.log.info(msg)
 
     def debug(self, msg_raw):
         msg = '%s: %s'%(self.log_nm, msg_raw)
-        logger.debug(self, msg)
+        self.log.debug(msg)
         QgsLogger.debug(msg)
         
     def warning(self, msg):
-        logger.warning(self, msg)
+        self.log.warning(msg)
         self._loghlp(msg, Qgis.Warning, push=False)
 
         
     def push(self, msg):
-        logger.push(self, msg)
+        #self.log.push(msg)
         self._loghlp(msg, Qgis.Info, push=True)
 
     def error(self, msg):
-        logger.error(self, msg)
+        self.log.critical(msg)
         self._loghlp(msg, Qgis.Critical, push=True)
         
     def _loghlp(self, #helper function for generalized logging
