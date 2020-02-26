@@ -6,7 +6,7 @@ Created on Feb. 7, 2020
 common helper functions for use across project
 '''
 from logging import critical
-
+from datetime import datetime
 """
 todo: migrate off of here
 
@@ -306,12 +306,18 @@ class logger(object): #workaround for qgis logging pythonic
         self.log.info(msg)
 
     def debug(self, msg_raw):
+        now = datetime.now()
+        date_time = now.strftime("%Y-%d-%mT%H:%M:%S\t")
+        error_type = "DEBUG\t"
         msg = '%s: %s'%(self.log_nm, msg_raw)
-        self.log.debug(msg)
+        self.log.debug(date_time + error_type + msg)
         QgsLogger.debug(msg)
         
     def warning(self, msg):
-        self.log.warning(msg)
+        now = datetime.now()
+        date_time = now.strftime("%Y-%d-%mT%H:%M:%S\t")
+        error_type = "DEBUG\t"
+        self.log.warning(date_time + error_type + msg)
         self._loghlp(msg, Qgis.Warning, push=False)
 
         
@@ -320,7 +326,11 @@ class logger(object): #workaround for qgis logging pythonic
         self._loghlp(msg, Qgis.Info, push=True)
 
     def error(self, msg):
-        self.log.critical(msg)
+        now = datetime.now()
+        date_time = now.strftime("%Y-%d-%mT%H:%M:%S\t")
+        error_type = "DEBUG\t"
+
+        self.log.critical(date_time + error_type + msg)
         self._loghlp(msg, Qgis.Critical, push=True)
         
     def _loghlp(self, #helper function for generalized logging
